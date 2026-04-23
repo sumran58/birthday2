@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Dad! 🎂</title>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pink:#ff6b9d; --orange:#ff9a3c; --yellow:#ffd93d;
+  --purple:#a855f7; --teal:#06d6a0; --red:#ff4757; --bg:#fff8f0;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family:'Nunito',sans-serif;
+  background: linear-gradient(160deg,#fff0f8 0%,#fff8ec 40%,#f0fff8 100%);
+  min-height:100vh; overflow-x:hidden;
+}
+
+/* custom cursor */
+body { cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32'><text y='28' font-size='28'>💖</text></svg>") 16 16, auto; }
+
+#confetti-canvas { position:fixed;inset:0;pointer-events:none;z-index:999; }
+
+/* ── Floating things ── */
+.floaters { position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden; }
+.floater {
+  position:absolute; bottom:-100px;
+  animation:rise linear infinite;
+  opacity:0;
+}
+@keyframes rise {
+  0%   { transform:translateY(0) rotate(0deg) scale(.8); opacity:0; }
+  10%  { opacity:.8; }
+  90%  { opacity:.6; }
+  100% { transform:translateY(-110vh) rotate(360deg) scale(1.1); opacity:0; }
+}
+
+/* ── Sparkle particles ── */
+.sparkle-field { position:fixed;inset:0;pointer-events:none;z-index:1; }
+.sp {
+  position:absolute;
+  width:8px; height:8px;
+  border-radius:50%;
+  animation:sparkleAnim ease-in-out infinite;
+}
+@keyframes sparkleAnim {
+  0%,100%{ transform:scale(0);opacity:0; }
+  50%    { transform:scale(1);opacity:1; }
+}
+
+/* ── Hero ── */
+.hero {
+  position:relative; z-index:10;
+  text-align:center; padding:50px 20px 0;
+}
+
+/* wobbling emoji row */
+.emoji-row { display:flex; justify-content:center; gap:8px; margin-bottom:16px; }
+.emoji-row span {
+  font-size:2.4rem;
+  animation:wobbleEmoji ease-in-out infinite;
+  display:inline-block;
+}
+.emoji-row span:nth-child(1){animation-duration:1.1s;animation-delay:0s}
+.emoji-row span:nth-child(2){animation-duration:.9s;animation-delay:.15s}
+.emoji-row span:nth-child(3){animation-duration:1.3s;animation-delay:.3s}
+.emoji-row span:nth-child(4){animation-duration:1s;animation-delay:.45s}
+.emoji-row span:nth-child(5){animation-duration:.85s;animation-delay:.6s}
+@keyframes wobbleEmoji {
+  0%,100%{ transform:translateY(0) rotate(-8deg) scale(1); }
+  50%    { transform:translateY(-16px) rotate(8deg) scale(1.15); }
+}
+
+.hero-title {
+  font-family:'Pacifico',cursive;
+  font-size:clamp(2.6rem,8vw,5.5rem);
+  line-height:1.1;
+  background:linear-gradient(135deg,#ff6b9d,#ff9a3c,#ffd93d,#a855f7,#06d6a0);
+  background-size:200% 200%;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+  animation:gradShift 4s ease-in-out infinite;
+  filter:drop-shadow(3px 5px 0 rgba(255,107,157,.2));
+}
+@keyframes gradShift {
+  0%,100%{background-position:0% 50%} 50%{background-position:100% 50%}
+}
+
+.hero-sub {
+  font-size:clamp(.95rem,2.5vw,1.3rem);
+  color:#c026d3; font-weight:800;
+  margin-top:10px;
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{ 0%,100%{opacity:1}50%{opacity:.6} }
+
+/* ── Cake ── */
+.cake-section {
+  position:relative; z-index:10;
+  text-align:center; margin:24px 0 0;
+}
+.big-cake {
+  font-size:clamp(7rem,18vw,10rem);
+  display:inline-block;
+  animation:cakeBounce 1.4s cubic-bezier(.36,.07,.19,.97) infinite;
+  filter:drop-shadow(0 10px 30px rgba(255,107,157,.5));
+  cursor:pointer;
+  transition:filter .2s;
+}
+@keyframes cakeBounce {
+  0%  { transform:scale(1) rotate(-4deg) translateY(0); }
+  20% { transform:scale(1.1) rotate(4deg) translateY(-18px); }
+  40% { transform:scale(.95) rotate(-2deg) translateY(-8px); }
+  60% { transform:scale(1.05) rotate(3deg) translateY(-14px); }
+  80% { transform:scale(.98) rotate(-3deg) translateY(-4px); }
+  100%{ transform:scale(1) rotate(-4deg) translateY(0); }
+}
+.big-cake:hover { filter:drop-shadow(0 10px 50px rgba(255,215,0,.8)); animation-play-state:paused; transform:scale(1.2) rotate(10deg)!important; }
+.cake-hint { color:#c026d3; font-weight:800; font-size:.95rem; margin-top:6px; animation:pulse 1.5s ease-in-out infinite; }
+
+/* ── Scrolling ticker ── */
+.ticker-wrap {
+  position:relative; z-index:10;
+  overflow:hidden;
+  margin:20px 0;
+  padding:14px 0;
+  background:linear-gradient(90deg,#ff6b9d,#ff9a3c,#ffd93d,#06d6a0,#a855f7,#ff6b9d);
+  background-size:200% 100%;
+  animation:gradShift 3s linear infinite;
+}
+.ticker {
+  display:flex; gap:50px; white-space:nowrap;
+  font-family:'Pacifico',cursive; font-size:1.1rem;
+  color:white; text-shadow:0 2px 4px rgba(0,0,0,.2);
+  animation:scrollTick 20s linear infinite;
+}
+@keyframes scrollTick{ 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+/* ── Message card ── */
+.card-wrapper {
+  position:relative; z-index:10;
+  max-width:680px; margin:24px auto;
+  padding:0 18px;
+}
+.card {
+  background:white;
+  border-radius:32px;
+  padding:36px 32px;
+  box-shadow:0 20px 60px rgba(255,107,157,.18), 0 4px 16px rgba(0,0,0,.05);
+  position:relative; overflow:hidden;
+}
+.card::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:6px;
+  background:linear-gradient(90deg,#ff6b9d,#ffd93d,#06d6a0,#a855f7,#ff6b9d);
+  background-size:200% 100%;
+  animation:gradShift 3s linear infinite;
+}
+.card p { font-size:1.08rem; line-height:1.9; color:#444; font-weight:700; }
+.card p .hl  { color:var(--pink); font-weight:900; }
+.card p .hl2 { color:var(--purple); font-weight:900; }
+.card p .hl3 { color:var(--orange); font-weight:900; }
+
+/* ── Wishes grid ── */
+.wishes {
+  position:relative; z-index:10;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:16px; max-width:720px;
+  margin:0 auto 20px; padding:0 18px;
+}
+.wish-card {
+  background:white; border-radius:24px;
+  padding:26px 18px; text-align:center;
+  box-shadow:0 8px 30px rgba(0,0,0,.07);
+  border-top:5px solid var(--c);
+  cursor:pointer;
+  transition:transform .2s, box-shadow .2s;
+  position:relative; overflow:hidden;
+}
+.wish-card::after {
+  content:attr(data-secret);
+  position:absolute; inset:0; background:var(--c);
+  display:flex; align-items:center; justify-content:center;
+  font-size:.85rem; font-weight:800; color:white;
+  padding:12px; border-radius:24px;
+  opacity:0; transition:opacity .3s;
+  text-align:center; line-height:1.4;
+}
+.wish-card:hover::after { opacity:1; }
+.wish-card:hover { transform:translateY(-10px) rotate(-2deg); box-shadow:0 20px 40px rgba(0,0,0,.14); }
+.wish-card .icon { font-size:2.6rem; margin-bottom:10px; display:block;
+  animation:iconDance ease-in-out infinite;
+  animation-duration:var(--d,1.2s);
+}
+@keyframes iconDance {
+  0%,100%{transform:scale(1) rotate(-5deg)}
+  50%    {transform:scale(1.15) rotate(5deg)}
+}
+.wish-card h3 { font-size:1rem; font-weight:900; color:#333; margin-bottom:5px; }
+.wish-card p  { font-size:.85rem; color:#888; font-weight:700; line-height:1.5; }
+
+/* ── Dancing buttons ── */
+.btn-section {
+  position:relative; z-index:10;
+  text-align:center; padding:0 18px 10px;
+  max-width:720px; margin:0 auto;
+}
+.btn-section .label {
+  font-family:'Pacifico',cursive;
+  font-size:1.3rem; color:#c026d3;
+  margin-bottom:16px; display:block;
+}
+.btn-grid { display:flex; flex-wrap:wrap; gap:14px; justify-content:center; }
+
+.fun-btn {
+  border:none; border-radius:50px;
+  padding:14px 26px;
+  font-family:'Pacifico',cursive; font-size:1rem;
+  cursor:pointer; color:white;
+  display:flex; align-items:center; gap:8px;
+  box-shadow:0 8px 20px rgba(0,0,0,.15);
+  transition:box-shadow .2s;
+  position:relative; overflow:hidden;
+}
+.fun-btn::before {
+  content:''; position:absolute;
+  inset:-2px; border-radius:52px; z-index:-1;
+  background:inherit; filter:blur(8px); opacity:.6;
+}
+.fun-btn span { font-size:1.4rem; }
+
+.b1{background:linear-gradient(135deg,#ff6b9d,#ff9a3c);animation:btnDance1 .9s ease-in-out infinite}
+.b2{background:linear-gradient(135deg,#a855f7,#60a5fa);animation:btnDance2 1.1s ease-in-out infinite}
+.b3{background:linear-gradient(135deg,#06d6a0,#ffd93d);animation:btnDance3 .75s ease-in-out infinite;color:#0d0d1a}
+.b4{background:linear-gradient(135deg,#ff4757,#ff9a3c);animation:btnDance4 1s ease-in-out infinite}
+.b5{background:linear-gradient(135deg,#ffd93d,#ff6b9d);animation:btnDance5 .85s ease-in-out infinite}
+
+@keyframes btnDance1{ 0%,100%{transform:rotate(-5deg) translateY(0)} 50%{transform:rotate(5deg) translateY(-10px)} }
+@keyframes btnDance2{ 0%,100%{transform:skewX(0) scale(1)} 50%{transform:skewX(6deg) scale(1.06)} }
+@keyframes btnDance3{ 0%,100%{transform:translateX(0) rotate(0)} 25%{transform:translateX(-6px) rotate(-3deg)} 75%{transform:translateX(6px) rotate(3deg)} }
+@keyframes btnDance4{ 0%,100%{transform:scale(1) rotate(0)} 33%{transform:scale(1.08) rotate(-4deg)} 66%{transform:scale(.95) rotate(4deg)} }
+@keyframes btnDance5{ 0%,100%{transform:translateY(0) rotate(-3deg)} 50%{transform:translateY(-14px) rotate(3deg)} }
+
+.fun-btn:hover  { animation-play-state:paused; transform:scale(1.12)!important; box-shadow:0 16px 30px rgba(0,0,0,.25); }
+.fun-btn:active { transform:scale(.96)!important; }
+
+/* ── Modal ── */
+.modal-overlay {
+  display:none; position:fixed; inset:0; z-index:9000;
+  background:rgba(0,0,0,.6); backdrop-filter:blur(8px);
+  align-items:center; justify-content:center;
+}
+.modal-overlay.show { display:flex; }
+.modal {
+  background:white; border-radius:32px;
+  padding:40px 32px; text-align:center;
+  max-width:440px; width:90%;
+  animation:popIn .4s cubic-bezier(.34,1.56,.64,1);
+  position:relative; overflow:hidden;
+}
+.modal::before {
+  content:''; position:absolute; top:0;left:0;right:0;height:6px;
+  background:linear-gradient(90deg,#ff6b9d,#ffd93d,#06d6a0);
+  animation:gradShift 2s linear infinite;
+  background-size:200% 100%;
+}
+@keyframes popIn{ from{transform:scale(.4) rotate(-12deg);opacity:0} to{transform:scale(1) rotate(0);opacity:1} }
+.modal .m-emoji { font-size:4.5rem; display:block; margin-bottom:8px; animation:cakeBounce 1s ease-in-out infinite; }
+.modal h2 { font-family:'Pacifico',cursive; font-size:1.9rem; margin-bottom:10px; }
+.modal p  { font-size:1rem; color:#555; line-height:1.8; font-weight:700; }
+.modal-close {
+  margin-top:20px; padding:12px 36px;
+  background:linear-gradient(135deg,#ff6b9d,#ff9a3c);
+  border:none; border-radius:50px; color:white;
+  font-family:'Pacifico',cursive; font-size:1.1rem;
+  cursor:pointer; box-shadow:0 8px 20px rgba(255,107,157,.4);
+  transition:transform .15s;
+}
+.modal-close:hover { transform:scale(1.08); }
+
+/* ── Signature ── */
+.signature {
+  position:relative; z-index:10;
+  text-align:center; padding:20px 20px 70px;
+}
+.sig-inner {
+  display:inline-block;
+  background:white;
+  border-radius:28px;
+  padding:28px 44px;
+  box-shadow:0 16px 50px rgba(255,107,157,.2);
+  animation:sigFloat 3s ease-in-out infinite;
+  border:3px dashed rgba(255,107,157,.3);
+}
+@keyframes sigFloat{ 0%,100%{transform:translateY(0) rotate(-1deg)} 50%{transform:translateY(-10px) rotate(1deg)} }
+.sig-inner p {
+  font-family:'Pacifico',cursive;
+  font-size:clamp(1.3rem,4vw,2rem);
+  background:linear-gradient(90deg,var(--purple),var(--pink));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+  line-height:1.5;
+}
+.hearts-row { font-size:1.8rem; animation:heartbeat 1.2s ease-in-out infinite; display:inline-block; margin-top:8px; }
+@keyframes heartbeat{ 0%,100%{transform:scale(1)} 30%{transform:scale(1.4)} 60%{transform:scale(1.1)} }
+
+/* ── Stars divider ── */
+.star-div {
+  text-align:center; font-size:1.5rem;
+  margin:16px 0; display:block;
+  animation:starExpand 3s ease-in-out infinite;
+}
+@keyframes starExpand { 0%,100%{letter-spacing:4px} 50%{letter-spacing:14px} }
+
+/* ── Counter strip ── */
+.counts {
+  position:relative; z-index:10;
+  display:flex; flex-wrap:wrap; gap:12px;
+  max-width:680px; margin:0 auto 24px;
+  padding:0 18px; justify-content:center;
+}
+.count-box {
+  background:white; border-radius:20px;
+  padding:16px 20px; text-align:center; flex:1; min-width:130px;
+  box-shadow:0 6px 20px rgba(0,0,0,.07);
+  border-bottom:4px solid var(--c);
+  transition:transform .2s;
+  cursor:default;
+}
+.count-box:hover { transform:translateY(-6px); }
+.count-box .num {
+  font-family:'Pacifico',cursive; font-size:2rem;
+  color:var(--c);
+}
+.count-box .lbl { font-size:.8rem; color:#888; font-weight:800; margin-top:4px; }
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+<div class="floaters" id="floaters"></div>
+<div class="sparkle-field" id="sparkles"></div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <span class="m-emoji" id="mEmoji">🎂</span>
+    <h2 id="mTitle" style="color:#ff6b9d">Yay!</h2>
+    <p id="mText">You are the best!</p>
+    <button class="modal-close" onclick="closeModal()">Awww 🥹 Close</button>
+  </div>
+</div>
+
+<!-- Ticker -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    🎉 HAPPY BIRTHDAY DAD! &nbsp; 💖 SAAD & SIMRAN LOVE YOU! &nbsp;
+    👑 YOU'RE THE KING! &nbsp; 🎂 CAKE ALL DAY! &nbsp;
+    🌟 BEST DAD IN THE UNIVERSE! &nbsp; 🥳 TODAY IS YOUR DAY! &nbsp;
+    🎉 HAPPY BIRTHDAY DAD! &nbsp; 💖 SAAD & SIMRAN LOVE YOU! &nbsp;
+    👑 YOU'RE THE KING! &nbsp; 🎂 CAKE ALL DAY! &nbsp;
+    🌟 BEST DAD IN THE UNIVERSE! &nbsp; 🥳 TODAY IS YOUR DAY! &nbsp;
+  </div>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="emoji-row">
+    <span>🎉</span><span>🎈</span><span>🎂</span><span>🎊</span><span>🌟</span>
+  </div>
+  <div class="hero-title">Happy Birthday,<br>Dearest Daaaddd! 🎂</div>
+  <div class="hero-sub">✨ The World's Greatest Dad just levelled up! ✨</div>
+</section>
+
+<!-- Cake -->
+<div class="cake-section">
+  <div class="big-cake" id="bigCake" onclick="cakeClick()">🎂</div>
+  <p class="cake-hint">👆 Click the cake for a surprise!</p>
+</div>
+
+<span class="star-div">⭐ 💛 ⭐ 💛 ⭐ 💛 ⭐</span>
+
+<!-- Message card -->
+<div class="card-wrapper">
+  <div class="card">
+    <p>
+      Dear <span class="hl">Dadd</span>, today the whole world stops — because it's the birthday
+      of the most <span class="hl2">wonderfully amazing</span> human we have ever known. 🥰
+      You are our loudest cheerleader, and the reason our home always feels
+      like <span class="hl3">home</span>.
+      <br><br>
+      Today is <span class="hl3">YOUR</span> day. No responsibilities. Just cake, love, and us
+      absolutely refusing to let you feel anything but <span class="hl">incredibly special</span>. 💖
+    </p>
+    <span class="star-div" style="margin:14px 0 0">🌸 💖 🌸 💖 🌸</span>
+  </div>
+</div>
+
+<!-- Counters -->
+<div class="counts">
+  <div class="count-box" style="--c:#ff6b9d"><div class="num" id="c1">∞</div><div class="lbl">Hugs Today</div></div>
+  <div class="count-box" style="--c:#a855f7"><div class="num" id="c2">0</div><div class="lbl">Times We Love You</div></div>
+  <div class="count-box" style="--c:#ff9a3c"><div class="num" id="c3">0</div><div class="lbl">Reasons You're Great</div></div>
+  <div class="count-box" style="--c:#06d6a0"><div class="num" id="c4">0</div><div class="lbl">Cake Slices Earned</div></div>
+</div>
+
+<!-- Wishes -->
+<div class="wishes">
+  <div class="wish-card" style="--c:#ff6b9d;--d:1.1s" data-secret="Our love for you is literally INFINITE Dad! 💖">
+    <span class="icon">❤️</span>
+    <h3>Endless Love</h3>
+    <p>Hover to feel the love! 😊</p>
+  </div>
+  <div class="wish-card" style="--c:#ffd93d;--d:.9s" data-secret="May every single second today be pure joy! 😄🎉">
+    <span class="icon">😄</span>
+    <h3>Joy & Laughter</h3>
+    <p>Hover for your wish! ✨</p>
+  </div>
+  <div class="wish-card" style="--c:#06d6a0;--d:1.3s" data-secret="Health, strength & energy — all yours! 💪🌟">
+    <span class="icon">🌟</span>
+    <h3>Good Health</h3>
+    <p>Hover to unwrap! 🎁</p>
+  </div>
+  <div class="wish-card" style="--c:#a855f7;--d:1s" data-secret="Every dream you have — coming true this year! 🌈">
+    <span class="icon">🌈</span>
+    <h3>Dreams Come True</h3>
+    <p>Hover for magic! 🪄</p>
+  </div>
+  <div class="wish-card" style="--c:#ff9a3c;--d:1.2s" data-secret="Officially the GREATEST Dad in the universe! 👑🏆">
+    <span class="icon">👑</span>
+    <h3>Our Hero</h3>
+    <p>Hover for your crown! 👑</p>
+  </div>
+  <div class="wish-card" style="--c:#ff4757;--d:.85s" data-secret="ALL the world's happiness — reserved for you today! 🎊">
+    <span class="icon">🎊</span>
+    <h3>Pure Happiness</h3>
+    <p>Hover for surprise! 🎉</p>
+  </div>
+</div>
+
+<!-- Dancing buttons -->
+<div class="btn-section">
+  <span class="label">🕺 Tap any button — they're dancing for YOU Dad! 🕺</span>
+  <div class="btn-grid">
+    <button class="fun-btn b1" onclick="showModal('🤗','Sending You A Hug!','Dad, if hugs were money you\'d be a BILLIONAIRE today. Here\'s 10,000 virtual hugs from Saad & Simran — collect them all! 🤗💪','#ff6b9d')">
+      <span>🤗</span> Hug Machine!
+    </button>
+    <button class="fun-btn b2" onclick="showModal('👑','Crown Ceremony!','By the official authority of Saad & Simran, you are hereby declared the WORLD\'S COOLEST DAD. No one can ever take this title. Ever. 👑😤','#a855f7')">
+      <span>👑</span> Crown Dad!
+    </button>
+    <button class="fun-btn b3" onclick="showModal('😂','Dad Joke Time!','Why do dads always smile on their birthday? Because they know their kids love them so much, they made an ENTIRE WEBSITE just for them! 😂💖','#06d6a0')">
+      <span>😂</span> Dad Joke!
+    </button>
+    <button class="fun-btn b4" onclick="showModal('🌟','Wishing On A Star!','We wished on every single star tonight — great health, endless happiness, and that someone else makes chai for you today. You deserve it! ⭐✨','#ff4757')">
+      <span>🌟</span> Make A Wish!
+    </button>
+    <button class="fun-btn b5" onclick="partyMode()">
+      <span>🎊</span> PARTY MODE!!!
+    </button>
+  </div>
+</div>
+
+<span class="star-div" style="margin:28px 0 20px">🎈 🌸 🎈 🌸 🎈</span>
+
+<!-- Signature -->
+<div class="signature">
+  <div class="sig-inner">
+    <p>With all our love 💖</p>
+    <p>— Saad & Simran 🌙</p>
+    <div class="hearts-row">💖 💖 💖</div>
+    <p style="font-family:Nunito,sans-serif;font-size:.9rem;color:#c026d3;font-weight:800;margin-top:8px;-webkit-text-fill-color:#c026d3">P.S. You're stuck with us forever 😜</p>
+  </div>
+</div>
+
+<script>
+/* ── Floaters ── */
+const floatEl = document.getElementById('floaters');
+const fEmojis = ['🎈','🎀','🌸','🦋','⭐','💛','🌺','🎊','💖','🌟','🎉','🥰'];
+for(let i=0;i<22;i++){
+  const b=document.createElement('div');
+  b.className='floater';
+  b.textContent=fEmojis[i%fEmojis.length];
+  b.style.left=Math.random()*100+'vw';
+  b.style.fontSize=(1.8+Math.random()*2.2)+'rem';
+  b.style.animationDuration=(7+Math.random()*10)+'s';
+  b.style.animationDelay=(Math.random()*14)+'s';
+  floatEl.appendChild(b);
+}
+
+/* ── Sparkles ── */
+const sparkEl=document.getElementById('sparkles');
+const spColors=['#ff6b9d','#ffd93d','#ff9a3c','#a855f7','#06d6a0'];
+for(let i=0;i<30;i++){
+  const s=document.createElement('div');
+  s.className='sp';
+  s.style.top=Math.random()*100+'vh';
+  s.style.left=Math.random()*100+'vw';
+  s.style.background=spColors[Math.floor(Math.random()*spColors.length)];
+  s.style.animationDuration=(1.5+Math.random()*3)+'s';
+  s.style.animationDelay=(Math.random()*4)+'s';
+  sparkEl.appendChild(s);
+}
+
+/* ── Confetti ── */
+const cvs=document.getElementById('confetti-canvas');
+const ctx=cvs.getContext('2d');
+cvs.width=innerWidth; cvs.height=innerHeight;
+window.addEventListener('resize',()=>{cvs.width=innerWidth;cvs.height=innerHeight;});
+let parts=[]; let rafId=null;
+const cols=['#ff6b9d','#ffd93d','#ff9a3c','#a855f7','#06d6a0','#ff4757','#60a5fa','#fff'];
+function spawnParts(n=140,cx,cy){
+  for(let i=0;i<n;i++){
+    const a=Math.random()*Math.PI*2, spd=cx!=null?5+Math.random()*7:Math.random()*3+2;
+    parts.push({
+      x:cx??Math.random()*cvs.width, y:cy??-10,
+      vx:cx!=null?Math.cos(a)*spd:(Math.random()-.5)*5,
+      vy:cy!=null?Math.sin(a)*spd:spd,
+      color:cols[Math.floor(Math.random()*cols.length)],
+      size:5+Math.random()*8, alpha:1,
+      spin:(Math.random()-.5)*.25, angle:Math.random()*Math.PI*2,
+      shape:Math.random()>.4?'rect':'circle'
+    });
+  }
+}
+function drawParts(){
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  parts=parts.filter(p=>p.alpha>.02);
+  for(const p of parts){
+    ctx.save(); ctx.globalAlpha=p.alpha; ctx.fillStyle=p.color;
+    ctx.translate(p.x,p.y); ctx.rotate(p.angle);
+    if(p.shape==='rect') ctx.fillRect(-p.size/2,-p.size/4,p.size,p.size/2);
+    else{ctx.beginPath();ctx.arc(0,0,p.size/2,0,Math.PI*2);ctx.fill();}
+    ctx.restore();
+    p.x+=p.vx; p.y+=p.vy; p.vy+=.08; p.alpha-=.011; p.angle+=p.spin;
+  }
+  if(parts.length) rafId=requestAnimationFrame(drawParts);
+  else rafId=null;
+}
+function burst(n=160,cx,cy){
+  spawnParts(n,cx,cy);
+  if(!rafId) drawParts();
+}
+
+/* ── Emoji rain ── */
+function rainEmojis(list,count=10){
+  for(let i=0;i<count;i++){
+    setTimeout(()=>{
+      const el=document.createElement('div');
+      el.textContent=list[Math.floor(Math.random()*list.length)];
+      el.style.cssText=`position:fixed;top:-60px;left:${5+Math.random()*90}vw;
+        font-size:${1.8+Math.random()*2}rem;z-index:9999;pointer-events:none;
+        transition:top 2.8s ease-in,opacity 2.8s;opacity:1;`;
+      document.body.appendChild(el);
+      requestAnimationFrame(()=>{el.style.top=(50+Math.random()*35)+'vh';el.style.opacity='0';});
+      setTimeout(()=>el.remove(),3000);
+    },i*110);
+  }
+}
+
+/* ── Cake click ── */
+let cakeN=0;
+const cakeLines=[
+  ['🎂','Yummy Cake Alert!','The secret birthday button has been discovered! Confetti for the detective Dad! 🎊👑'],
+  ['🍰','Another Slice!','Scientists confirm: Dad deserves the ENTIRE cake. Nobody else gets any. 🍰😄'],
+  ['🎉','Birthday Magic!','You found another surprise! That\'s because YOU are the surprise of our lives, Dad! 🥹'],
+  ['✨','Wish Granted!','Your wish is shooting across the sky RIGHT NOW. Can you feel it? ✨🌟'],
+  ['👑','KING MODE ON!','All hail the birthday king! The throne is yours today and every day! 👑🎊'],
+];
+function cakeClick(){
+  const cake=document.getElementById('bigCake');
+  const r=cake.getBoundingClientRect();
+  burst(130,r.left+r.width/2,r.top+r.height/2);
+  rainEmojis(['🎂','🎉','✨','💖','🌟','🎈'],10);
+  const d=cakeLines[cakeN%cakeLines.length]; cakeN++;
+  showModal(d[0],d[1],d[2],'#ff9a3c');
+}
+
+/* ── Modal ── */
+function showModal(emoji,title,text,color='#ff6b9d'){
+  document.getElementById('mEmoji').textContent=emoji;
+  document.getElementById('mTitle').textContent=title;
+  document.getElementById('mTitle').style.color=color;
+  document.getElementById('mText').textContent=text;
+  document.getElementById('modal').classList.add('show');
+  burst(80); rainEmojis([emoji,'💖','✨'],6);
+}
+function closeModal(){ document.getElementById('modal').classList.remove('show'); }
+document.getElementById('modal').addEventListener('click',e=>{
+  if(e.target.id==='modal') closeModal();
+});
+
+/* ── Party mode ── */
+function partyMode(){
+  burst(280);
+  rainEmojis(['🎉','🎊','💖','🌟','🎂','👑','🥳','🔥','✨','🎈'],22);
+  document.querySelectorAll('.fun-btn').forEach(b=>{
+    b.style.animationPlayState='paused';
+    let n=0;
+    const iv=setInterval(()=>{
+      b.style.transform=`translate(${(Math.random()-.5)*14}px,${(Math.random()-.5)*14}px) rotate(${(Math.random()-.5)*20}deg)`;
+      if(++n>18){clearInterval(iv);b.style.transform='';b.style.animationPlayState='';}
+    },80);
+  });
+  // flash body
+  let f=0;
+  const fc=setInterval(()=>{
+    document.body.style.filter=f%2?'brightness(1.15) saturate(1.5)':'none';
+    if(++f>10){clearInterval(fc);document.body.style.filter='';}
+  },200);
+}
+
+/* ── Counters ── */
+function animCount(el,target,dur=1800){
+  const s=Date.now();
+  const t=()=>{
+    const p=Math.min((Date.now()-s)/dur,1);
+    const ease=1-Math.pow(1-p,3);
+    el.textContent=Math.floor(ease*target).toLocaleString();
+    if(p<1)requestAnimationFrame(t);
+  };
+  t();
+}
+setTimeout(()=>{
+  animCount(document.getElementById('c2'),999999,2200);
+  animCount(document.getElementById('c3'),1000000,2400);
+  animCount(document.getElementById('c4'),100,1400);
+},500);
+
+/* ── Auto burst on load ── */
+setTimeout(()=>{ burst(90); rainEmojis(['🎉','🎂','💖','🌟','🥳'],8); },800);
+</script>
+</body>
+</html>
